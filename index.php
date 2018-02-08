@@ -3,8 +3,11 @@
 class QuestionsCrawler{
     public function __construct(){
         $this ->enter = 'http://www.tiku.cn';
-        $this ->getContent();
+        // $this ->getContent();
         $this ->res = [];
+        //$this ->get_question_type();
+        $text = file_get_contents('test.html');
+        echo $this ->get_question_page($text);
         //$this ->get_level_data($this ->enter);
     }
     public function get_level_data($url){
@@ -15,7 +18,7 @@ class QuestionsCrawler{
             if( !empty($res1[1]) ){
                 if( preg_match_all($reg2,$res1[1],$res2)  ){
                     if( !empty($res2[1]) ){
-                        foreach( $res[1] as $k=>$v ){
+                        foreach( $res2[1] as $k=>$v ){
                             $this ->res[] = $this ->get_level_type_data($v);
                         }
                     }
@@ -30,25 +33,28 @@ class QuestionsCrawler{
     // 获取中、小学的所有课目数据
     public function get_level_type_data($text){
         $arr = [];
-        $reg = "/<span>([\u4e00-\u9fa5]+) | <\/span>[\r\n\s]*<a href=\"(\/index\/index\/questions?cid=(\d+)&cno=1)\" target=\"_blank\">试题<\/a>\"/";
+        $reg = "/<span>([\x80-\xff]{1,}) \| <\/span>[\n\s\r]*<span><a href=\"(\/index\/index\/questions\?cid=(\d+)&cno=1)\"[\n\s\r]*?target=\"_blank\">试题<\/a>/";
+        //file_put_contents('test.html','<html><head><meta charset="utf-8 />"</head><body>'.$text.'</body><html>');
         if( preg_match_all($reg,$text,$res) ){
-            foreach( $res[2] as $k=>$v ){
-                $arr[$res[1][$k]] = $this ->get_question_type($this ->enter.$v);
+            //echo json_encode($res);
+            //file_put_contents('test.html','<html><head><meta charset="utf-8 />"</head><body>'.$res[1][0].'</body><html>');
+            foreach( $res[1] as $k=>$v ){
+                $arr[$res[2][$k]] = $this ->get_question_type($this ->enter.$v);
             }
         }
     }
     // 获取课目下的题目类型
-    public function get_question_type($url){
+    public function get_question_type($url=''){
         $arr = [];
         $text = file_get_contents($url);
         $reg1 = "/<ul class=\"ul-ques\">([\s\S]*?)<\/ul>/";
         $reg2 = "/<b onclick=\"tourl\((\d+),'unitid'\)\"[\s\S]+?>([\s\S]+?)<\/b>/";
         if( preg_match($reg1,$text,$res1) ){
-            if( empty($res1[1]) ){
+            if( !empty($res1[1]) ){
                 if( preg_match_all($reg2,$res1[1],$res2) ){
-                    foreach( $res[1] as $k=>$v ){
+                    foreach( $res2[1] as $k=>$v ){
                         $arr[] = [
-                            'type'=>$res[2][$k],
+                            'type'=>$res2[2][$k],
                             'content'=>$this ->get_all_questions($url.'&unitid='.$v)
                         ];
                     }
@@ -100,9 +106,9 @@ class QuestionsCrawler{
 
     }
     // 获取所有页面的题目数据
-    public function get_all_page_question($url){
+    public function get_all_page_question($url=''){
         $arr = [];
-        $text = file_get_contents($url);
+        $text = file_get_contents('test.html');
         $page = $this ->get_question_page($text);
         for( $i=1;$i<=$page;$i++ ){
             $data = $this ->get_questions($url.'&page='.$i);
@@ -139,6 +145,7 @@ class QuestionsCrawler{
         $reg1 = "/<ul class=\"pagination\">([\s\S]+?)<\/ul>/";
         $reg2 = "/<a href=[\s\S]+?>(\d+?)<\/a>[\r\n\s]*<a href=[\s\S]+?>»<\/a>/";
         if( preg_match($reg1,$text,$res1) ){
+            echo json_encode($res1);
             if( preg_match($reg2,$res1[1],$res2) ){
                 return $res2[1];
             }
