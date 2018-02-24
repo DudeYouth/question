@@ -1,0 +1,4 @@
+images/
+*.log
+result.json
+result_map.json
