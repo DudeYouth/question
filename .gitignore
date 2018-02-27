@@ -1,4 +1,5 @@
 images/
 *.log
+*.json
 result.json
 result_map.json

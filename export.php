@@ -8,8 +8,15 @@
     require 'PHPExcel/Classes/PHPExcel/Writer/Excel5.php';
     set_time_limit(0);
     function getImages(){
-        $data = file_get_contents('result.json');
-        $arr = json_decode($data,true);
+        try{
+            $data = file_get_contents('res.json');
+            $arr = json_decode($data,true);
+            $ret = json_last_error();
+            print_r($ret);
+        }catch(Exception $e){
+            echo $e;
+        }
+        
         $reg = "/<img[\s\S]+src=\"(.*?)\".*?>/";
         $type_reg = "/\.[a-zA-Z0-9]+$/";
         foreach($arr as &$v){
