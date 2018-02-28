@@ -58,7 +58,8 @@ class QuestionsCrawler{
         //$this ->get_questions($text);
         $this ->answer = ['A'=>1,'B'=>2,'C'=>3,'D'=>4,'a'=>1,'b'=>2,'c'=>3,'d'=>4];
         //$this ->get_questions('http://www.tiku.cn/index/index/questions?cid=4&cno=1&unitid=800003&bid=800009&typeid=600047&vid=800005&page=1');die;
-        $this ->get_level_data($this ->enter);
+       // $this ->get_level_data($this ->enter);
+        $this ->get_level_type_data('');
         // $text = request('test.html');
         // $this ->get_question_radio_id($text);
     }
@@ -84,24 +85,24 @@ class QuestionsCrawler{
     }
     // 获取中、小学的所有课目数据
     public function get_level_type_data($text){
-        $arr = [];
-        $reg = "/<span>([\x80-\xff]{1,}) \| <\/span>[\n\s\r]*<span><a href=\"(\/index\/index\/questions\?cid=(\d+)&cno=1)\"[\n\s\r]*?target=\"_blank\">试题<\/a>/";
-        //file_put_contents('test.html','<html><head><meta charset="utf-8 />"</head><body>'.$text.'</body><html>');
-        if( preg_match_all($reg,$text,$res) ){
-            // file_put_contents('test.html','<html><head><meta charset="utf-8 />"</head><body>'.$res[1][0].'</body><html>');
-            foreach( $res[2] as $k=>$v ){
-                $this ->get_question_type($this ->enter.$v);
+        // $arr = [];
+        // $reg = "/<span>([\x80-\xff]{1,}) \| <\/span>[\n\s\r]*<span><a href=\"(\/index\/index\/questions\?cid=(\d+)&cno=1)\"[\n\s\r]*?target=\"_blank\">试题<\/a>/";
+        // //file_put_contents('test.html','<html><head><meta charset="utf-8 />"</head><body>'.$text.'</body><html>');
+        // if( preg_match_all($reg,$text,$res) ){
+        //     // file_put_contents('test.html','<html><head><meta charset="utf-8 />"</head><body>'.$res[1][0].'</body><html>');
+        //     foreach( $res[2] as $k=>$v ){
+        //         $this ->get_question_type($this ->enter.$v);
+        //     }
+        // }
+        $types = [['/index/index/questions?cid=14&cno=1','数学'],['/index/index/questions?cid=21&cno=1','语文'],['/index/index/questions?cid=23&cno=1','英语']];
+            foreach( $types as $k=>$v ){
+                $this ->sub_name = $v[1];
+                $this ->get_question_type($this ->enter.$v[0]);
+                // $arr[$k] = [
+                //     'name'=>$v[1],
+                //     'content'=>$this ->get_question_type($this ->enter.$v[0])
+                // ];
             }
-        }
-        // $types = [['/index/index/questions?cid=14&cno=1','数学'],['/index/index/questions?cid=21&cno=1','语文'],['/index/index/questions?cid=23&cno=1','英语']];
-            // foreach( $types as $k=>$v ){
-            //     $this ->sub_name = $v[1];
-            //     $this ->get_question_type($this ->enter.$v[0]);
-            //     // $arr[$k] = [
-            //     //     'name'=>$v[1],
-            //     //     'content'=>$this ->get_question_type($this ->enter.$v[0])
-            //     // ];
-            // }
     }
     // 获取课目下的题目类型
     public function get_question_type($url=''){
